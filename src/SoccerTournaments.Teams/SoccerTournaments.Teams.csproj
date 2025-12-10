@@ -17,10 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="api/" />
-    <Folder Include="application/" />
     <Folder Include="infrastructure/" />
-    <Folder Include="domain/" />
   </ItemGroup>
 
 </Project>
