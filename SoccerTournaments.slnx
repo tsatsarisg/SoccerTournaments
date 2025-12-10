@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SoccerTournaments.Api/SoccerTournaments.Api.csproj" />
+    <Project Path="src/SoccerTournaments.Teams/SoccerTournaments.Teams.csproj" />
+    <Project Path="src/SoccerTournaments.Tournaments/SoccerTournaments.Tournaments.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SoccerTournaments.Api.Tests/SoccerTournaments.Api.Tests.csproj" />
+    <Project Path="tests/SoccerTournaments.Teams.Tests/SoccerTournaments.Teams.Tests.csproj" />
+    <Project Path="tests/SoccerTournaments.Tournaments.Tests/SoccerTournaments.Tournaments.Tests.csproj" />
+  </Folder>
+</Solution>
