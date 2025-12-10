@@ -4,3 +4,13 @@ GET {{SoccerTournaments.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+POST {{SoccerTournaments.Api_HostAddress}}/teams/
+Content-Type: application/json
+
+{
+  "name": "Arsenal",
+  "city": "London"
+}
+
+###
