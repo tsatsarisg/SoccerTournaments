@@ -1,3 +1,5 @@
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,7 +9,19 @@ public static class TeamsModule
 {
     public static IServiceCollection AddTeamsModule(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<ITeamsService, TeamsService>();
+        // Database
+        services.AddDbContext<TeamsDbContext>(options =>
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+
+        // Repositories
+        services.AddScoped<ITeamsRepository, TeamsRepository>();
+
+        // Handlers
+        services.AddScoped<CreateTeamHandler>();
+
+        // Validators
+        services.AddValidatorsFromAssemblyContaining<CreateTeamCommandValidator>();
+
         return services;
     }
 }
