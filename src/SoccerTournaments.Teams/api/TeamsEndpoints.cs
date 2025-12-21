@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Builder;  
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;     
+using Microsoft.AspNetCore.Routing;
+using SoccerTournaments.Teams.Api.Dtos;
 
-namespace SoccerTournaments.Teams;
+namespace SoccerTournaments.Teams.Api;
 
 public static class TeamsEndpoints
 {
@@ -15,35 +16,29 @@ public static class TeamsEndpoints
             var command = new CreateTeamCommand(request.Name, request.City);
             var result = await handler.HandleAsync(command, cancellationToken);
             
-            if (result.IsFailed)
-            {
-                return Results.BadRequest(new { errors = result.Errors.Select(e => e.Message) });
-            }
-
-            var team = result.Value;
-            return Results.Created($"/teams/{team.Id}", new TeamResponse(team.Id, team.Name, team.City, team.CreationDate));
+            return result.ToIResult(team => 
+                Results.Created($"/teams/{team.Id}", new TeamResponse(team.Id, team.Name, team.City, team.CreationDate)));
         });
 
-        group.MapGet("/{id:guid}", async (Guid id, ITeamsRepository repository, CancellationToken cancellationToken) =>
+        group.MapGet("/{id:guid}", async (Guid id, GetTeamByIdHandler handler, CancellationToken cancellationToken) =>
         {
-            var team = await repository.GetByIdAsync(id, cancellationToken);
+            var query = new GetTeamByIdQuery(id);
+            var result = await handler.HandleAsync(query, cancellationToken);
             
-            if (team == null)
-            {
-                return Results.NotFound(new { message = $"Team with id '{id}' not found" });
-            }
-
-            return Results.Ok(new TeamResponse(team.Id, team.Name, team.City, team.CreationDate));
+            return result.ToIResult(team => 
+                Results.Ok(new TeamResponse(team.Id, team.Name, team.City, team.CreationDate)));
         });
 
-        group.MapGet("/", async (ITeamsRepository repository, CancellationToken cancellationToken) =>
+        group.MapGet("/", async (GetAllTeamsHandler handler, CancellationToken cancellationToken) =>
         {
-            var teams = await repository.GetAllAsync(cancellationToken);
-            var response = teams.Select(t => new TeamResponse(t.Id, t.Name, t.City, t.CreationDate));
-            return Results.Ok(response);
+            var query = new GetAllTeamsQuery();
+            var result = await handler.HandleAsync(query, cancellationToken);
+            
+            return result.ToIResult(teams =>
+            {
+                var response = teams.Select(t => new TeamResponse(t.Id, t.Name, t.City, t.CreationDate));
+                return Results.Ok(response);
+            });
         });
     }
 }
-
-public record CreateTeamRequest(string Name, string City);
-public record TeamResponse(Guid Id, string Name, string City, DateTime CreationDate);

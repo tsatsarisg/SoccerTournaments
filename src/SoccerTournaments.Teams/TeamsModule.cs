@@ -18,6 +18,9 @@ public static class TeamsModule
 
         // Handlers
         services.AddScoped<CreateTeamHandler>();
+        services.AddScoped<GetTeamByIdHandler>();
+        services.AddScoped<GetAllTeamsHandler>();
+        services.AddScoped<GetTeamByNameHandler>();
 
         // Validators
         services.AddValidatorsFromAssemblyContaining<CreateTeamCommandValidator>();

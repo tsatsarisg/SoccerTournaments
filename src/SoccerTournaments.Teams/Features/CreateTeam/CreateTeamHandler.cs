@@ -7,14 +7,19 @@ public class CreateTeamHandler
 {
     private readonly ITeamsRepository _repository;
     private readonly IValidator<CreateTeamCommand> _validator;
+    private readonly GetTeamByNameHandler _getTeamByNameHandler;
 
-    public CreateTeamHandler(ITeamsRepository repository, IValidator<CreateTeamCommand> validator)
+    public CreateTeamHandler(
+        ITeamsRepository repository, 
+        IValidator<CreateTeamCommand> validator,
+        GetTeamByNameHandler getTeamByNameHandler)
     {
         _repository = repository;
         _validator = validator;
+        _getTeamByNameHandler = getTeamByNameHandler;
     }
 
-    public async Task<Result<Team>> HandleAsync(CreateTeamCommand command, CancellationToken cancellationToken = default)
+   public async Task<Result<Team>> HandleAsync(CreateTeamCommand command, CancellationToken cancellationToken = default)
     {
         // Validate command
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
@@ -24,11 +29,14 @@ public class CreateTeamHandler
             return Result.Fail(string.Join(", ", errors));
         }
 
-        // Check for duplicate team name
-        var existingTeam = await _repository.GetByNameAsync(command.Name, cancellationToken);
-        if (existingTeam != null)
+        // Check for duplicate team name using GetTeamByNameHandler
+        var getTeamQuery = new GetTeamByNameQuery(command.Name);
+        var getTeamResult = await _getTeamByNameHandler.HandleAsync(getTeamQuery, cancellationToken);
+        
+        // If team exists, it's a duplicate
+        if (getTeamResult.IsSuccess)
         {
-            return Result.Fail($"A team with the name '{command.Name}' already exists");
+            return Result.Fail(AppError.Validation($"A team with the name '{command.Name}' already exists"));
         }
 
         // Create team domain entity
