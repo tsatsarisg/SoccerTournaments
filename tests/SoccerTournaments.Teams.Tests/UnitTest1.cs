@@ -5,16 +5,14 @@ namespace SoccerTournaments.Teams.Tests;
 public class UnitTest1
 {
     [Fact]
-    public async Task AddTeamAsync_ShouldAddTeam()
+    public void CreateTeam_ShouldCreateTeam()
     {
-        // Arrange
-        var service = new TeamsService();
-
         // Act
-        var team = await service.AddTeamAsync("Chelsea", "London");
+        var result = Team.Create("Chelsea", "London");
 
         // Assert
-        Assert.Equal("Chelsea", team.Name);
-        Assert.Equal("London", team.City);
+        Assert.True(result.IsSuccess);
+        Assert.Equal("Chelsea", result.Value.Name);
+        Assert.Equal("London", result.Value.City);
     }
 }

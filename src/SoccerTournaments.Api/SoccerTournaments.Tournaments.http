@@ -1,0 +1,56 @@
+@baseUrl = http://localhost:5259
+@tournamentName = Premier League 2026
+@startDate = 2026-08-15T00:00:00Z
+@maxTeams = 20
+
+###
+
+# @name createTournament
+POST {{baseUrl}}/tournaments/
+Content-Type: application/json
+
+{
+  "name": "{{tournamentName}}",
+  "startDate": "{{startDate}}",
+  "maxTeams": {{maxTeams}}
+}
+
+###
+
+GET {{baseUrl}}/tournaments/
+Accept: application/json
+
+###
+
+GET {{baseUrl}}/tournaments/{{createTournament.response.body.$.id}}
+Accept: application/json
+
+###
+
+# Duplicate name (should return 400)
+POST {{baseUrl}}/tournaments/
+Content-Type: application/json
+
+{
+  "name": "{{tournamentName}}",
+  "startDate": "{{startDate}}",
+  "maxTeams": {{maxTeams}}
+}
+
+###
+
+# Validation error - empty fields (should return 400)
+POST {{baseUrl}}/tournaments/
+Content-Type: application/json
+
+{
+  "name": "",
+  "startDate": "2026-08-15T00:00:00Z",
+  "maxTeams": 0
+}
+
+###
+
+# Not found (should return 404)
+GET {{baseUrl}}/tournaments/11111111-1111-1111-1111-111111111111
+Accept: application/json

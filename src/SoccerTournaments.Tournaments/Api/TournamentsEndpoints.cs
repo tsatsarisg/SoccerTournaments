@@ -1,0 +1,44 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using SoccerTournaments.Tournaments.Api.Dtos;
+
+namespace SoccerTournaments.Tournaments.Api;
+
+public static class TournamentsEndpoints
+{
+    public static void MapTournamentsEndpoints(this IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/tournaments");
+
+        group.MapPost("/", async (CreateTournamentHandler handler, CreateTournamentRequest request, CancellationToken cancellationToken) =>
+        {
+            var command = new CreateTournamentCommand(request.Name, request.StartDate, request.MaxTeams);
+            var result = await handler.HandleAsync(command, cancellationToken);
+
+            return result.ToIResult(tournament =>
+                Results.Created($"/tournaments/{tournament.Id}", new TournamentResponse(tournament.Id, tournament.Name, tournament.StartDate, tournament.MaxTeams, tournament.CreationDate)));
+        });
+
+        group.MapGet("/{id:guid}", async (Guid id, GetTournamentByIdHandler handler, CancellationToken cancellationToken) =>
+        {
+            var query = new GetTournamentByIdQuery(id);
+            var result = await handler.HandleAsync(query, cancellationToken);
+
+            return result.ToIResult(tournament =>
+                Results.Ok(new TournamentResponse(tournament.Id, tournament.Name, tournament.StartDate, tournament.MaxTeams, tournament.CreationDate)));
+        });
+
+        group.MapGet("/", async (GetAllTournamentsHandler handler, CancellationToken cancellationToken) =>
+        {
+            var query = new GetAllTournamentsQuery();
+            var result = await handler.HandleAsync(query, cancellationToken);
+
+            return result.ToIResult(tournaments =>
+            {
+                var response = tournaments.Select(t => new TournamentResponse(t.Id, t.Name, t.StartDate, t.MaxTeams, t.CreationDate));
+                return Results.Ok(response);
+            });
+        });
+    }
+}
