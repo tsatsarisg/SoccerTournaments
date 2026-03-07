@@ -1,16 +1,51 @@
-@SoccerTournaments.Api_HostAddress = http://localhost:5259
+@baseUrl = http://localhost:5259
+@teamName = Arsenal
+@teamCity = London
 
-GET {{SoccerTournaments.Api_HostAddress}}/weatherforecast/
+###
+
+# @name createTeam
+POST {{baseUrl}}/teams/
+Content-Type: application/json
+
+{
+  "name": "{{teamName}}",
+  "city": "{{teamCity}}"
+}
+
+###
+
+GET {{baseUrl}}/teams/
 Accept: application/json
 
 ###
 
-POST {{SoccerTournaments.Api_HostAddress}}/teams/
+GET {{baseUrl}}/teams/{{createTeam.response.body.$.id}}
+Accept: application/json
+
+###
+
+POST {{baseUrl}}/teams/
 Content-Type: application/json
 
 {
-  "name": "Arsenal",
-  "city": "London"
+  "name": "{{teamName}}",
+  "city": "{{teamCity}}"
 }
+
+###
+
+POST {{baseUrl}}/teams/
+Content-Type: application/json
+
+{
+  "name": "",
+  "city": ""
+}
+
+###
+
+GET {{baseUrl}}/teams/11111111-1111-1111-1111-111111111111
+Accept: application/json
 
 ###

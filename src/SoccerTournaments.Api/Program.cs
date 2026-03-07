@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SoccerTournaments.Teams;
+using SoccerTournaments.Teams.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 

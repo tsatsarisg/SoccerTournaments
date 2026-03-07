@@ -25,8 +25,11 @@ public class CreateTeamHandler
         var validationResult = await _validator.ValidateAsync(command, cancellationToken);
         if (!validationResult.IsValid)
         {
-            var errors = validationResult.Errors.Select(e => e.ErrorMessage);
-            return Result.Fail(string.Join(", ", errors));
+            var errors = validationResult.Errors
+                .Select(e => (IError)AppError.Validation(e.ErrorMessage))
+                .ToList();
+
+            return Result.Fail<Team>(errors);
         }
 
         // Check for duplicate team name using GetTeamByNameHandler
@@ -43,7 +46,11 @@ public class CreateTeamHandler
         var teamResult = Team.Create(command.Name, command.City);
         if (teamResult.IsFailed)
         {
-            return teamResult;
+            var errors = teamResult.Errors
+                .Select(e => (IError)AppError.Validation(e.Message))
+                .ToList();
+
+            return Result.Fail<Team>(errors);
         }
 
         // Persist team
