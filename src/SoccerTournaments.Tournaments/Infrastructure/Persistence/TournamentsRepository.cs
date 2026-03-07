@@ -34,4 +34,30 @@ public class TournamentsRepository : ITournamentsRepository
     {
         return await _context.Tournaments.ToListAsync(cancellationToken);
     }
+
+    public async Task<TournamentTeam> AddTeamAsync(TournamentTeam tournamentTeam, CancellationToken cancellationToken = default)
+    {
+        _context.TournamentTeams.Add(tournamentTeam);
+        await _context.SaveChangesAsync(cancellationToken);
+        return tournamentTeam;
+    }
+
+    public async Task<TournamentTeam?> GetTournamentTeamAsync(Guid tournamentId, Guid teamId, CancellationToken cancellationToken = default)
+    {
+        return await _context.TournamentTeams
+            .FirstOrDefaultAsync(tt => tt.TournamentId == tournamentId && tt.TeamId == teamId, cancellationToken);
+    }
+
+    public async Task<IEnumerable<TournamentTeam>> GetTournamentTeamsAsync(Guid tournamentId, CancellationToken cancellationToken = default)
+    {
+        return await _context.TournamentTeams
+            .Where(tt => tt.TournamentId == tournamentId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> GetTournamentTeamCountAsync(Guid tournamentId, CancellationToken cancellationToken = default)
+    {
+        return await _context.TournamentTeams
+            .CountAsync(tt => tt.TournamentId == tournamentId, cancellationToken);
+    }
 }

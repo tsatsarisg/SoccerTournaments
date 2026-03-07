@@ -9,6 +9,7 @@ public class TournamentsDbContext : DbContext
     }
 
     public DbSet<Tournament> Tournaments => Set<Tournament>();
+    public DbSet<TournamentTeam> TournamentTeams => Set<TournamentTeam>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -41,6 +42,31 @@ public class TournamentsDbContext : DbContext
             entity.Property(t => t.CreationDate)
                 .HasColumnName("creation_date")
                 .IsRequired();
+        });
+
+        modelBuilder.Entity<TournamentTeam>(entity =>
+        {
+            entity.ToTable("tournament_teams");
+
+            entity.HasKey(tt => new { tt.TournamentId, tt.TeamId });
+
+            entity.Property(tt => tt.TournamentId)
+                .HasColumnName("tournament_id")
+                .HasColumnType("uuid");
+
+            entity.Property(tt => tt.TeamId)
+                .HasColumnName("team_id")
+                .HasColumnType("uuid");
+
+            entity.Property(tt => tt.AddedAt)
+                .HasColumnName("added_at")
+                .IsRequired();
+
+            entity.HasOne<Tournament>()
+                .WithMany()
+                .HasForeignKey(tt => tt.TournamentId);
+
+            entity.HasIndex(tt => tt.TeamId);
         });
     }
 }

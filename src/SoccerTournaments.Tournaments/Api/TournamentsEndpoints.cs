@@ -40,5 +40,26 @@ public static class TournamentsEndpoints
                 return Results.Ok(response);
             });
         });
+
+        group.MapPost("/{tournamentId:guid}/teams", async (Guid tournamentId, AddTeamToTournamentHandler handler, AddTeamToTournamentRequest request, CancellationToken cancellationToken) =>
+        {
+            var command = new AddTeamToTournamentCommand(tournamentId, request.TeamId);
+            var result = await handler.HandleAsync(command, cancellationToken);
+
+            return result.ToIResult(tt =>
+                Results.Created($"/tournaments/{tt.TournamentId}/teams", new TournamentTeamResponse(tt.TournamentId, tt.TeamId, tt.AddedAt)));
+        });
+
+        group.MapGet("/{tournamentId:guid}/teams", async (Guid tournamentId, GetTournamentTeamsHandler handler, CancellationToken cancellationToken) =>
+        {
+            var query = new GetTournamentTeamsQuery(tournamentId);
+            var result = await handler.HandleAsync(query, cancellationToken);
+
+            return result.ToIResult(teams =>
+            {
+                var response = teams.Select(tt => new TournamentTeamResponse(tt.TournamentId, tt.TeamId, tt.AddedAt));
+                return Results.Ok(response);
+            });
+        });
     }
 }
