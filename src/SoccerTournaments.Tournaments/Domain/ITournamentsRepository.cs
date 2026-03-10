@@ -10,4 +10,8 @@ public interface ITournamentsRepository
     Task<TournamentTeam?> GetTournamentTeamAsync(Guid tournamentId, Guid teamId, CancellationToken cancellationToken = default);
     Task<IEnumerable<TournamentTeam>> GetTournamentTeamsAsync(Guid tournamentId, CancellationToken cancellationToken = default);
     Task<int> GetTournamentTeamCountAsync(Guid tournamentId, CancellationToken cancellationToken = default);
+    Task<Standing?> GetStandingAsync(Guid tournamentId, Guid teamId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Standing>> GetTournamentStandingsAsync(Guid tournamentId, CancellationToken cancellationToken = default);
+    Task<Standing> AddStandingAsync(Standing standing, CancellationToken cancellationToken = default);
+    Task UpdateStandingAsync(Standing standing, CancellationToken cancellationToken = default);
 }

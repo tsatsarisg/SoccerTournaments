@@ -10,6 +10,7 @@ public class TournamentsDbContext : DbContext
 
     public DbSet<Tournament> Tournaments => Set<Tournament>();
     public DbSet<TournamentTeam> TournamentTeams => Set<TournamentTeam>();
+    public DbSet<Standing> Standings => Set<Standing>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -67,6 +68,54 @@ public class TournamentsDbContext : DbContext
                 .HasForeignKey(tt => tt.TournamentId);
 
             entity.HasIndex(tt => tt.TeamId);
+        });
+
+        modelBuilder.Entity<Standing>(entity =>
+        {
+            entity.ToTable("standings");
+
+            entity.HasKey(s => new { s.TournamentId, s.TeamId });
+
+            entity.Property(s => s.TournamentId)
+                .HasColumnName("tournament_id")
+                .HasColumnType("uuid");
+
+            entity.Property(s => s.TeamId)
+                .HasColumnName("team_id")
+                .HasColumnType("uuid");
+
+            entity.Property(s => s.MatchesPlayed)
+                .HasColumnName("matches_played")
+                .IsRequired();
+
+            entity.Property(s => s.Wins)
+                .HasColumnName("wins")
+                .IsRequired();
+
+            entity.Property(s => s.Draws)
+                .HasColumnName("draws")
+                .IsRequired();
+
+            entity.Property(s => s.Losses)
+                .HasColumnName("losses")
+                .IsRequired();
+
+            entity.Property(s => s.GoalsFor)
+                .HasColumnName("goals_for")
+                .IsRequired();
+
+            entity.Property(s => s.GoalsAgainst)
+                .HasColumnName("goals_against")
+                .IsRequired();
+
+            entity.Ignore(s => s.GoalDifference);
+            entity.Ignore(s => s.Points);
+
+            entity.HasOne<Tournament>()
+                .WithMany()
+                .HasForeignKey(s => s.TournamentId);
+
+            entity.HasIndex(s => s.TeamId);
         });
     }
 }

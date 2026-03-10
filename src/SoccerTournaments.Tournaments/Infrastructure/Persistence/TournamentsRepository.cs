@@ -60,4 +60,30 @@ public class TournamentsRepository : ITournamentsRepository
         return await _context.TournamentTeams
             .CountAsync(tt => tt.TournamentId == tournamentId, cancellationToken);
     }
+
+    public async Task<Standing?> GetStandingAsync(Guid tournamentId, Guid teamId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Standings
+            .FirstOrDefaultAsync(s => s.TournamentId == tournamentId && s.TeamId == teamId, cancellationToken);
+    }
+
+    public async Task<IEnumerable<Standing>> GetTournamentStandingsAsync(Guid tournamentId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Standings
+            .Where(s => s.TournamentId == tournamentId)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Standing> AddStandingAsync(Standing standing, CancellationToken cancellationToken = default)
+    {
+        _context.Standings.Add(standing);
+        await _context.SaveChangesAsync(cancellationToken);
+        return standing;
+    }
+
+    public async Task UpdateStandingAsync(Standing standing, CancellationToken cancellationToken = default)
+    {
+        _context.Standings.Update(standing);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
 }

@@ -22,6 +22,8 @@ public static class TournamentsModule
         services.AddScoped<GetAllTournamentsHandler>();
         services.AddScoped<AddTeamToTournamentHandler>();
         services.AddScoped<GetTournamentTeamsHandler>();
+        services.AddScoped<RecordMatchResultHandler>();
+        services.AddScoped<GetTournamentStandingsHandler>();
 
         // Validators
         services.AddValidatorsFromAssemblyContaining<CreateTournamentCommandValidator>();

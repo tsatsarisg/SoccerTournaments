@@ -61,5 +61,29 @@ public static class TournamentsEndpoints
                 return Results.Ok(response);
             });
         });
+
+        group.MapPost("/{tournamentId:guid}/results", async (Guid tournamentId, RecordMatchResultHandler handler, RecordMatchResultRequest request, CancellationToken cancellationToken) =>
+        {
+            var command = new RecordMatchResultCommand(tournamentId, request.HomeTeamId, request.AwayTeamId, request.HomeGoals, request.AwayGoals);
+            var result = await handler.HandleAsync(command, cancellationToken);
+
+            return result.ToIResult(standings =>
+            {
+                var response = standings.Select(s => new StandingResponse(s.TournamentId, s.TeamId, s.MatchesPlayed, s.Wins, s.Draws, s.Losses, s.GoalsFor, s.GoalsAgainst, s.GoalDifference, s.Points));
+                return Results.Ok(response);
+            });
+        });
+
+        group.MapGet("/{tournamentId:guid}/standings", async (Guid tournamentId, GetTournamentStandingsHandler handler, CancellationToken cancellationToken) =>
+        {
+            var query = new GetTournamentStandingsQuery(tournamentId);
+            var result = await handler.HandleAsync(query, cancellationToken);
+
+            return result.ToIResult(standings =>
+            {
+                var response = standings.Select(s => new StandingResponse(s.TournamentId, s.TeamId, s.MatchesPlayed, s.Wins, s.Draws, s.Losses, s.GoalsFor, s.GoalsAgainst, s.GoalDifference, s.Points));
+                return Results.Ok(response);
+            });
+        });
     }
 }
