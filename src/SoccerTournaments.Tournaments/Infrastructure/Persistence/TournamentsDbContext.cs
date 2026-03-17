@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SoccerTournaments.Tournaments.Domain;
 
 namespace SoccerTournaments.Tournaments;
 
@@ -11,6 +12,7 @@ public class TournamentsDbContext : DbContext
     public DbSet<Tournament> Tournaments => Set<Tournament>();
     public DbSet<TournamentTeam> TournamentTeams => Set<TournamentTeam>();
     public DbSet<Standing> Standings => Set<Standing>();
+    public DbSet<Match> Matches => Set<Match>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -116,6 +118,58 @@ public class TournamentsDbContext : DbContext
                 .HasForeignKey(s => s.TournamentId);
 
             entity.HasIndex(s => s.TeamId);
+        });
+
+        modelBuilder.Entity<Match>(entity =>
+        {
+            entity.ToTable("matches");
+
+            entity.HasKey(m => m.Id);
+
+            entity.Property(m => m.Id)
+                .HasColumnName("id")
+                .HasColumnType("uuid")
+                .ValueGeneratedNever();
+
+            entity.Property(m => m.TournamentId)
+                .HasColumnName("tournament_id")
+                .HasColumnType("uuid")
+                .IsRequired();
+
+            entity.Property(m => m.HomeTeamId)
+                .HasColumnName("home_team_id")
+                .HasColumnType("uuid")
+                .IsRequired();
+
+            entity.Property(m => m.AwayTeamId)
+                .HasColumnName("away_team_id")
+                .HasColumnType("uuid")
+                .IsRequired();
+
+            entity.Property(m => m.ScheduledDate)
+                .HasColumnName("scheduled_date");
+
+            entity.Property(m => m.Status)
+                .HasColumnName("status")
+                .HasConversion<int>()
+                .IsRequired();
+
+            entity.Property(m => m.HomeGoals)
+                .HasColumnName("home_goals");
+
+            entity.Property(m => m.AwayGoals)
+                .HasColumnName("away_goals");
+
+            entity.Property(m => m.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired();
+
+            entity.HasOne<Tournament>()
+                .WithMany()
+                .HasForeignKey(m => m.TournamentId);
+
+            entity.HasIndex(m => m.TournamentId);
+            entity.HasIndex(m => m.Status);
         });
     }
 }

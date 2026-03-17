@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SoccerTournaments.Tournaments.Domain;
 
 namespace SoccerTournaments.Tournaments;
 
@@ -84,6 +85,33 @@ public class TournamentsRepository : ITournamentsRepository
     public async Task UpdateStandingAsync(Standing standing, CancellationToken cancellationToken = default)
     {
         _context.Standings.Update(standing);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<Match> AddMatchAsync(Match match, CancellationToken cancellationToken = default)
+    {
+        _context.Matches.Add(match);
+        await _context.SaveChangesAsync(cancellationToken);
+        return match;
+    }
+
+    public async Task<Match?> GetMatchByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Matches
+            .FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+    }
+
+    public async Task<IEnumerable<Match>> GetTournamentMatchesAsync(Guid tournamentId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Matches
+            .Where(m => m.TournamentId == tournamentId)
+            .OrderBy(m => m.ScheduledDate)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task UpdateMatchAsync(Match match, CancellationToken cancellationToken = default)
+    {
+        _context.Matches.Update(match);
         await _context.SaveChangesAsync(cancellationToken);
     }
 }

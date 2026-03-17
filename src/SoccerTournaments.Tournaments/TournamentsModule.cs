@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SoccerTournaments.Tournaments.Features;
 
 namespace SoccerTournaments.Tournaments;
 
@@ -24,6 +25,9 @@ public static class TournamentsModule
         services.AddScoped<GetTournamentTeamsHandler>();
         services.AddScoped<RecordMatchResultHandler>();
         services.AddScoped<GetTournamentStandingsHandler>();
+        services.AddScoped<ScheduleMatchHandler>();
+        services.AddScoped<GetTournamentMatchesHandler>();
+        services.AddScoped<UpdateMatchStatusHandler>();
 
         // Validators
         services.AddValidatorsFromAssemblyContaining<CreateTournamentCommandValidator>();
