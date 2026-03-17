@@ -1,3 +1,5 @@
+using SoccerTournaments.Tournaments.Domain;
+
 namespace SoccerTournaments.Tournaments;
 
 public interface ITournamentsRepository
@@ -14,4 +16,8 @@ public interface ITournamentsRepository
     Task<IEnumerable<Standing>> GetTournamentStandingsAsync(Guid tournamentId, CancellationToken cancellationToken = default);
     Task<Standing> AddStandingAsync(Standing standing, CancellationToken cancellationToken = default);
     Task UpdateStandingAsync(Standing standing, CancellationToken cancellationToken = default);
+    Task<Match> AddMatchAsync(Match match, CancellationToken cancellationToken = default);
+    Task<Match?> GetMatchByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Match>> GetTournamentMatchesAsync(Guid tournamentId, CancellationToken cancellationToken = default);
+    Task UpdateMatchAsync(Match match, CancellationToken cancellationToken = default);
 }

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using SoccerTournaments.Tournaments.Api.Dtos;
+using SoccerTournaments.Tournaments.Features;
+using SoccerTournaments.Tournaments.Domain;
 
 namespace SoccerTournaments.Tournaments.Api;
 
@@ -84,6 +86,41 @@ public static class TournamentsEndpoints
                 var response = standings.Select(s => new StandingResponse(s.TournamentId, s.TeamId, s.MatchesPlayed, s.Wins, s.Draws, s.Losses, s.GoalsFor, s.GoalsAgainst, s.GoalDifference, s.Points));
                 return Results.Ok(response);
             });
+        });
+
+        group.MapPost("/{tournamentId:guid}/matches", async (Guid tournamentId, ScheduleMatchHandler handler, ScheduleMatchRequest request, CancellationToken cancellationToken) =>
+        {
+            var command = new ScheduleMatchCommand(tournamentId, request.HomeTeamId, request.AwayTeamId, request.ScheduledDate);
+            var result = await handler.Handle(command, cancellationToken);
+
+            return result.ToIResult(match =>
+                Results.Created($"/tournaments/{tournamentId}/matches", new MatchResponse(match.Id, match.TournamentId, match.HomeTeamId, match.AwayTeamId, match.ScheduledDate, match.Status.ToString(), match.HomeGoals, match.AwayGoals, match.CreatedAt)));
+        });
+
+        group.MapGet("/{tournamentId:guid}/matches", async (Guid tournamentId, GetTournamentMatchesHandler handler, CancellationToken cancellationToken) =>
+        {
+            var query = new GetTournamentMatchesQuery(tournamentId);
+            var result = await handler.Handle(query, cancellationToken);
+
+            return result.ToIResult(matches =>
+            {
+                var response = matches.Select(m => new MatchResponse(m.Id, m.TournamentId, m.HomeTeamId, m.AwayTeamId, m.ScheduledDate, m.Status.ToString(), m.HomeGoals, m.AwayGoals, m.CreatedAt));
+                return Results.Ok(response);
+            });
+        });
+
+        group.MapPatch("/{tournamentId:guid}/matches/{matchId:guid}/status", async (Guid matchId, UpdateMatchStatusHandler handler, UpdateMatchStatusRequest request, CancellationToken cancellationToken) =>
+        {
+            if (!Enum.TryParse<MatchStatus>(request.Status, true, out var status))
+            {
+                return Results.BadRequest(new { error = "Invalid match status" });
+            }
+
+            var command = new UpdateMatchStatusCommand(matchId, status, request.HomeGoals, request.AwayGoals);
+            var result = await handler.Handle(command, cancellationToken);
+
+            return result.ToIResult(match =>
+                Results.Ok(new MatchResponse(match.Id, match.TournamentId, match.HomeTeamId, match.AwayTeamId, match.ScheduledDate, match.Status.ToString(), match.HomeGoals, match.AwayGoals, match.CreatedAt)));
         });
     }
 }

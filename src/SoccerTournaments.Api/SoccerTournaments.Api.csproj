@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SoccerTournaments.Tournaments\SoccerTournaments.Tournaments.csproj" />
     <ProjectReference Include="..\SoccerTournaments.Teams\SoccerTournaments.Teams.csproj" />
+    <ProjectReference Include="..\SoccerTournaments.Players\SoccerTournaments.Players.csproj" />
   </ItemGroup>
 
 </Project>
